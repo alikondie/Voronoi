@@ -1,8 +1,6 @@
 import java.util.ArrayList;
-
-
 ArrayList<PVector> points;
-
+color[] colors;
 void setup() {
   
   //render params
@@ -11,20 +9,15 @@ void setup() {
   //noSmooth();
   //fullScreen();
   frameRate(400);
-  strokeWeight(3);
-  point(640,56);
+  
   
   PVector[] points;
-  int pointsNumber = 100;
+  int pointsNumber = 20;
   points = RandomPoints(pointsNumber);
-  color[] colors;
+  
   colors = randomColors(pointsNumber);
   
-  // random point drawing
-  for(PVector p : points){
-    //print(p.x+","+p.y+"\n");
-    point(p.x,p.y); 
-  }
+  voronoi(points,colors,false);
 }
 
 
@@ -64,10 +57,15 @@ color[] randomColors(int pointsNumber){
 }
 
 int minDistanceIndex(PVector point, PVector[] points,boolean isManhattan){
+  
+  
+  
   float[] distances = new float[points.length];
   if(!isManhattan){
     
      for(int i = 0; i < points.length;i++){
+         if(point.x == points[i].x && point.y == points[i].y)
+           return -5;
          distances[i]  = euclideanDistance(point,points[i]);
      }  
 
@@ -75,6 +73,8 @@ int minDistanceIndex(PVector point, PVector[] points,boolean isManhattan){
   else{
     
      for(int i = 0; i < points.length;i++){
+         if(point.x == points[i].x && point.y == points[i].y)
+           return -5;
          distances[i]  = manhattanDistance(point,points[i]);
      }  
   }
@@ -92,12 +92,34 @@ int minDistanceIndex(PVector point, PVector[] points,boolean isManhattan){
   
 }
 
-void voronoi(PVector[] points, color[] colors){
-   
+void voronoi(PVector[] points, color[] colors,boolean isManhattan){
+    //strokeWeight(3);
+    PVector point;
+    int xPos;
+    int yPos;
+    int index;
     for(int i = 0; i < height * width;i++){
-      
-      
-      
+        xPos = i / width;
+        yPos = i - ( xPos * width);
+        point = new PVector(yPos,xPos);
+        if(!isManhattan)
+          index = minDistanceIndex(point,points,false);
+        else
+          index = minDistanceIndex(point,points,true);
+        if(index == -5)
+        {
+          
+          stroke(color(0,0,0));
+          fill(color(0,0,0));
+          circle(yPos, xPos, 5);
+        }
+        else{
+          stroke(colors[index]);
+          point(yPos,xPos);
+        }
+        //print(index+"\n");
+        
+        
     }
   
 }
